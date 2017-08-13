@@ -15,7 +15,8 @@ class App extends Component {
     this.state = {
       mql: mql,
       docked: props.docked,
-      open: props.open
+      open: props.open,
+      view: 'Rides'
     }
   }
 
@@ -38,6 +39,18 @@ class App extends Component {
     this.setState({sidebarDocked: this.state.mql.matches});
   }
 
+  determineView = () => {
+    var view = null;
+    switch(this.state.view) {
+      case "Rides":
+        view = <Rides />;
+        break;
+      default: 
+        view = <Rides />;
+    }
+    return view;
+  }
+
   render() {
     var sidebarContent = (
       <b>Krew Admin</b>
@@ -57,7 +70,7 @@ class App extends Component {
         onSetOpen={this.onSetSidebarOpen}
       >
         <Grid className="App" fluid>
-          <Rides />
+          {this.determineView()}
         </Grid>
       </Sidebar>
     );
