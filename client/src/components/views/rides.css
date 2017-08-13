@@ -1,3 +1,16 @@
-.rides-dash h1 {
+.rides-dash h1, small {
     margin: 0;
+    padding-left: 15px;
+}
+
+.rides-dash h1 {
+    margin-top: 10px;
+}
+
+.rides-dash {
+    text-align: left;
+}
+
+.react-grid-Container {
+    margin-top: 20px;
 }

@@ -33,6 +33,28 @@ export default class Rides extends Component {
                     editable: true
                 }
             ],
+            acceptedRideColumns: [
+                {
+                    key: 'origin',
+                    name: 'Origin'
+                },
+                {
+                    key: 'destination',
+                    name: 'Destination'
+                },
+                {
+                    key: 'time',
+                    name: 'Time'
+                },
+                {
+                    key: 'date',
+                    name: 'Date'
+                },
+                {
+                    key: 'driver',
+                    name: 'Driver'
+                }
+            ],
             rideRequests: [],
             acceptedRides: [],
             rideHistory: []
@@ -41,13 +63,23 @@ export default class Rides extends Component {
 
     componentDidMount() {
         request
-            .get('http://krew-dev-api.herokuapp.com/rideRequests')
+            .get('https://krew-dev-api.herokuapp.com/rides/rideRequests?key=test')
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if (err) throw err;
+                console.log(res);
+                this.setState({
+                    rideRequests: res.body
+                });
+            });
+
+        request
+            .get('https://krew-dev-api.herokuapp.com/rides/acceptedRides?key=test')
             .set('Accept', 'application/json')
             .end((err, res) => {
                 if (err) throw err;
                 this.setState({
-                    rideRequests: res.body,
-                    rideRequestsLoaded: true
+                    acceptedRides: res.body
                 });
             });
     }
@@ -56,8 +88,11 @@ export default class Rides extends Component {
         return this.state.rideRequests[i];
     }
 
+    acceptedRideRowGetter = (i) => {
+        return this.state.acceptedRides[i];
+    }
+
     handleRideRequestUpdate = ({ fromRow, toRow, updated}) => {
-        console.log(fromRow, toRow, updated);
         let rideRequests = this.state.rideRequests.slice();
 
         for (let i = fromRow; i <= toRow; i++) {
@@ -75,26 +110,41 @@ export default class Rides extends Component {
 
         return(
             <Grid fluid className="rides-dash">
-                <Row>
-                    <h1>Ride Requests</h1>
+                
+                <Row>                        
+                    <Col md={12} lg={5}>
+                        <Row>
+                            <h1>Ride Requests</h1>
+                        </Row>
+                        <Row>
+                            <small>These rides have not yet been accepted by drivers.</small>
+                        </Row>
+                        <ReactDataGrid 
+                            className="rides-table"
+                            enableCellSelect={true}
+                            rowGetter={this.rideRequestRowGetter}
+                            rowsCount={this.state.rideRequests.length}
+                            columns={this.state.rideRequestColumns}    
+                            onGridRowsUpdated={this.handleRideRequestUpdate}
+                        />
+                    </Col>
+                    <Col md={12} lg={5} lgOffset={1}>
+                        <Row>
+                            <h1>Accepted Rides</h1>
+                        </Row>
+                        <Row>
+                            <small>These rides have been accepted by drivers, but have not been taken.</small>
+                        </Row>
+                        <ReactDataGrid 
+                            rowGetter={this.acceptedRideRowGetter}
+                            rowsCount={this.state.acceptedRides.length}
+                            columns={this.state.acceptedRideColumns}    
+                        />
+                    </Col>
                 </Row>
+                
                 <Row>
-                    <small>These rides have not yet been accepted by drivers.</small>
-                </Row>
-                <Row>
-                    <ReactDataGrid 
-                        enableCellSelect={true}
-                        rowGetter={this.rideRequestRowGetter}
-                        rowsCount={this.state.rideRequests.length}
-                        columns={this.state.rideRequestColumns}    
-                        onGridRowsUpdated={this.handleRideRequestUpdate}
-                    />
-                </Row>
-                <Row>
-                    <h1>Accepted Rides</h1>
-                </Row>
-                <Row>
-                    <small>These rides have been accepted by drivers, but have not been taken.</small>
+                    
                 </Row>
                 <Row>
                     <h1>Ride History</h1>
